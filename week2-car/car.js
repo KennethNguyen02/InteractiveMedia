@@ -180,6 +180,14 @@ function updateCarY(y){
 }
 
 
+function updateCarSpeed(velocity){
+	let width = windowWidth/2
+	if (mouseX < width)
+		return velocity * 8;
+	else return velocity * 5
+	
+}
+
 
 
 function setup() {
@@ -190,8 +198,9 @@ function setup() {
 
 function draw() {
 	let angle = frameCount * 0.01  
-	let velocity = frameCount * 5
+	let velocity = frameCount;
 	carY = updateCarY(carY)
+	velocity = updateCarSpeed(velocity)
 	dayNight(100,100,100,angle);
 	forest(125, velocity);
 	road(roadSize,velocity);
