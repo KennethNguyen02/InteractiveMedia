@@ -11,6 +11,7 @@ let roadSize = 275
 
 
 function dayNight(x,y,size,angle){
+	let bgValue = map(sin(angle), -1, 1, -100,10)
 	let bgColor = color(144 + bgValue, 213 + bgValue ,255 + bgValue);
 	background(bgColor);
 	push();
@@ -20,7 +21,7 @@ function dayNight(x,y,size,angle){
 	pop();
 
 	if(angle < PI){bgValue -= 1}
-	else{bgValue += 1};
+	else{bgValue += 1}
 }
 
 
@@ -30,11 +31,12 @@ function sun(x,y,size){
 		noStroke();
 		fill("yellow");
 		circle(x,y,size);
+
+		fill("orange");
+		circle(x,y,size*0.75);
+		fill("red");
+		circle(x,y,size*0.5);
 	pop();
-			fill("orange");
-			circle(x,y,size*0.75);
-				fill("red");
-				circle(x,y,size*0.5);
 
 }
 
@@ -83,37 +85,55 @@ function bush(x,y,w,h){
  
 function forest(h,velocity){
 	fill(65,152,10);
-	rect(0,height-roadSize-h,windowWidth, h);
+	let ground = height-roadSize - h;
+	rect(0,ground,width, h);
 		//trees
 	
-	triTree((velocity   )% windowWidth, (height-roadSize-h)  - 40, 50, 70 );
-	bushTree((velocity + 150)% windowWidth, (height-roadSize-h)  - 20, 70, 100 );
+	triTree(velocity% width, (ground)  - 40, 50, 70 );
+	bushTree((velocity + 150) % width, (ground)  - 20, 70, 100 );
 
 	
-	triTree((velocity + 350)% windowWidth, (height-roadSize-h) - 10, 50, 70 );
-	bushTree((velocity  + 600)% windowWidth, (height-roadSize-h) , 70, 100 );
+	triTree((velocity + 350) % width, (ground) - 10, 50, 70 );
+	bushTree((velocity + 600) % width, (ground) , 70, 100 );
 	
-	bush((velocity  + 900)% windowWidth, (height-roadSize-h) + 100 , 70, 100);
+	bush((velocity + 900)% width, (ground) + 100 , 70, 100);
 
 	
-	triTree((velocity  + 750)% windowWidth, (height-roadSize-h) - 20, 50, 70 );
-	bushTree((velocity  + 1120)% windowWidth, (height-roadSize-h)   - 5, 70, 100 );
+	triTree((velocity + 750) % width, (ground) - 20, 50, 70 );
+	bushTree((velocity + 1120) % width, (ground)   - 5, 70, 100 );
 		
 }
 
-
-
-function ferrari(x,y,w,h,color, wheelSize){
+function wheel(x,y,h,d){ 
+		//wheel
+	fill("black");
+	circle(x,y,d);
+		//inner circle 
+		fill("silver");
+		circle(x,y,d/2);
 	
-	fill(color);
+		//sticks inside wheel rotating
+		push();
+			translate(x,y);
+			rotate(-frameCount * 2);
+			fill("black");
+			rect(-d/2, 0, d, h / 60); //horizontal line
+			rect(0, -d/2, h/60, d); //vertical line
+		pop();			
+}
+
+
+function ferrari(x,y,w,h,carColor, wheelSize){
+	
+	fill(carColor);
 	rect(x,y,w,h,5);
 
 	//car border
 	fill("silver")
 	rect(x+75, y+h, w-150, h/8)
 
-	wheel(x+50,y+h,w,h,wheelSize) //backwheel
-	wheel(x+w-50,y+h,w,h,wheelSize) //frontwheel
+	wheel(x+50,y+h,h,wheelSize) //backwheel
+	wheel(x+w-50,y+h,h,wheelSize) //frontwheel
 
 
 	//window shield
@@ -141,38 +161,24 @@ function ferrari(x,y,w,h,color, wheelSize){
 }
 
 
-function wheel(x,y,w,h,d){ 
-		//wheel
-	fill("black");
-	circle(x,y,d);
-		//inner circle 
-		fill("silver");
-		circle(x,y,d/2);
-	
-		//sticks inside wheel rotating
-		push();
-			translate(x,y);
-			rotate(-frameCount * 2);
-			fill("black");
-			rect(-d/2, 0, d, h / 60); //horizontal line
-			rect(0, -d/2, h/60, d); //vertical line
-		pop();			
-}
-
-
 
 function road(h,velocity){
 	fill("grey");
-	rect(0,height-h, windowWidth, h);
+	rect(0,height-h, width, h);
 
 	//yellow line gen
-	for (i = 0; i < 6; i++){
+	for (let i = 0; i < 6; i++){
 		fill(247, 181,0);
-		rect((velocity + i * 250) % windowWidth, height- 100, 50, 10)	
-	}
-		
-	
+		rect((velocity + i * 250) % width, height- 100, 50, 10)	
+	}	
 }
+
+function updateCarY(y){
+	if (mouseY > (height - roadSize) && mouseY < height){
+		return y = mouseY;
+	} else return y = 500;
+}
+
 
 
 
@@ -183,12 +189,13 @@ function setup() {
 
 
 function draw() {
-	let angle = frameCount * 0.01 % TWO_PI 
+	let angle = frameCount * 0.01  
 	let velocity = frameCount * 5
+	carY = updateCarY(carY)
 	dayNight(100,100,100,angle);
 	forest(125, velocity);
 	road(roadSize,velocity);
-	ferrari(carX,carY,275,75, "red" ,wheelSize);
+	ferrari(carX,carY,carWidth,carHeight, "red" ,wheelSize);
 	
 }
 
